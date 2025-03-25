@@ -1,0 +1,50 @@
+document.getElementById('garden-form').addEventListener('submit', function(event) {
+  event.preventDefault();
+
+  const gardenName = document.getElementById('gardenName').value;
+  const gardenType = document.getElementById('gardenType').value;
+  const plants = document.getElementById('plants').value;
+
+  const gardenData = {
+    gardenName,
+    gardenType,
+    plants
+  };
+
+  fetch('/api/gardens', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(gardenData),
+  })
+  .then(response => response.json())
+  .then(data => {
+    // Add garden to the list
+    displayGarden(data);
+    document.getElementById('garden-form').reset();
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  });
+});
+
+function displayGarden(garden) {
+  const gardenList = document.getElementById('gardens-list');
+  const gardenItem = document.createElement('li');
+  gardenItem.textContent = `${garden.gardenName} - ${garden.gardenType} - Plants: ${garden.plants}`;
+  gardenList.appendChild(gardenItem);
+}
+
+window.onload = () => {
+  fetch('/api/gardens')
+    .then(response => response.json())
+    .then(gardens => {
+      gardens.forEach(garden => {
+        displayGarden(garden);
+      });
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+};
